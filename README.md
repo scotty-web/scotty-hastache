@@ -8,6 +8,30 @@ Integrating Hastache to Scotty
 
 This is still work-in-progress
 
+```haskell
+{-# LANGUAGE OverloadedStrings #-}
+module Main where
+ 
+import Text.Hastache
+import Web.Scotty as S
+import Web.Scotty.Hastache
+ 
+main :: IO ()
+main = scottyH 3000 $ do
+  setTemplatesDir "templates"
+  -- ^ Setting up the director with templates
+  get "/:word" $ do
+    beam <- param "word"
+    setH "action" $ MuVariable (beam :: String)
+    -- ^ "action" will be binded to the contents of 'beam'
+    hastache "greet.html"
+```
+
+templates/greet.html:
+```html
+<h1>Scotty, {{action}} me up!</h1>
+```
+
 Installation
 =========
 
