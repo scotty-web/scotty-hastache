@@ -35,7 +35,8 @@ import Text.Blaze.Html.Renderer.String as BRS
 -- | State with Hastache config
 type HState = StateT ((MuConfig IO, Map String (MuType IO))) IO 
                 
-type ScottyH a = ScottyT HState a
+type ScottyH = ScottyT HState
+type ActionH = ActionT HState
 
 scottyH :: Port -> ScottyH () -> IO ()
 scottyH p = scottyHOpts $ def { settings = (settings def) { settingsPort = p } }
