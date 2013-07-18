@@ -72,6 +72,11 @@ setTemplatesDir dir = do
   (conf :: MuConfig IO, map) <- lift State.get
   lift . State.put $ (conf { muTemplateFileDir = Just dir }, map)
 
+setHastacheConfig :: MuConfig IO -> ScottyH ()
+setHastacheConfig conf = do
+  (_, map) <- lift State.get
+  lift . State.put $ (conf, map)
+
 hastache :: FilePath -> ActionT HState ()
 hastache tpl = do
   ((conf :: MuConfig IO), map) <- lift State.get
@@ -79,7 +84,7 @@ hastache tpl = do
   let cntx a  = fromMaybe MuNothing (M.lookup a map)
   let tplFile = fromMaybe "." (muTemplateFileDir conf)
               </> tpl
-              </> fromMaybe "" (muTemplateFileExt conf)
+              ++ fromMaybe "" (muTemplateFileExt conf)
   res <- liftIO $ hastacheFile conf tplFile (mkStrContext cntx)
   raw res
 
