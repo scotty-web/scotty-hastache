@@ -17,7 +17,6 @@ extra-source-files:  examples/hastachetest.hs
                      
 library
   exposed-modules:     Web.Scotty.Hastache
-  --- other-modules:       
   build-depends:       base            >= 4.4 && < 5,          
                        blaze-builder   >= 0.3.1.0, 
                        blaze-html      >= 0.6.0.0,    
@@ -37,7 +36,7 @@ library
 
 
   hs-source-dirs:      src
-  GHC-options:         -Wall -fno-warn-orphans
+  GHC-options:         -Wall -Werror -fno-warn-orphans 
   default-language:    Haskell2010
 
 source-repository head
