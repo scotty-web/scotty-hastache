@@ -11,11 +11,11 @@ This is still work-in-progress
 ```haskell
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
- 
+
 import Text.Hastache
-import Web.Scotty as S
+import Web.Scotty.Trans as S
 import Web.Scotty.Hastache
- 
+
 main :: IO ()
 main = scottyH 3000 $ do
   setTemplatesDir "templates"
@@ -36,13 +36,11 @@ Installation
 =========
 
 1. Install GHC, Haskell platform, etc
-2. Install my fork of Scotty:
-  you need to checkout the `scotty-transformer` branch.
+2. Install Scotty >= 0.5.0. Currently:
 
   ```
-  $ git clone https://github.com/co-dan/scotty.git
-  $ cd scotty 
-  $ git checkout scotty-transformer
+  $ git clone https://github.com/xich/scotty.git
+  $ cd scotty
   $ cabal install
   ```
 3. Install hastache:
