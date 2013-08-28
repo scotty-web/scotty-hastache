@@ -5,65 +5,59 @@
 {-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TypeSynonymInstances       #-}
+{-# LANGUAGE ImpredicativeTypes         #-}
 
 -- | Hastache templating for Scotty
 module Web.Scotty.Hastache where
 
-import           Blaze.ByteString.Builder        (fromByteString)
-import           Control.Monad.Morph
+import           Control.Concurrent.MVar
 import           Control.Monad.State             as State
-import           Data.Default
-import           Data.Map                        (Map)
 import qualified Data.Map                        as M
 import           Data.Maybe
 import           Data.Monoid
-import           Network.HTTP.Types
 import           Network.Wai
-import           Network.Wai.Handler.Warp        (Port, runSettings,
-                                                  settingsPort)
+import           Network.Wai.Handler.Warp        (Port)
 import           System.FilePath.Posix
 import           Text.Blaze.Html.Renderer.String as BRS
 import           Text.Blaze.Html.Renderer.Utf8   as BRU
 import           Text.Blaze.Internal
 import           Text.Hastache
 import           Text.Hastache.Context
-import           Web.Scotty                      as S
-import           Web.Scotty.Types
+import           Web.Scotty.Trans                as S
 
 -- | State with Hastache config
-type HState = StateT ((MuConfig IO, Map String (MuType IO))) IO
+type HState = StateT ((MuConfig IO, M.Map String (MuType IO))) IO
 
 type ScottyH = ScottyT HState
 type ActionH = ActionT HState
 
+mkHStateRunners :: MuConfig IO -> IO (forall a. HState a -> IO a, HState Response -> IO Response)
+mkHStateRunners conf = do
+    sync <- newEmptyMVar
+    let runH m = do
+            (r,(muconf,_)) <- runStateT m (conf, mempty)
+            putMVar sync muconf
+            return r
+        runActionToIO m = do
+            -- state at the end of each action is not saved
+            muconf <- readMVar sync -- note readMVar instead of takeMVar, so non-blocking
+            evalStateT m (muconf, mempty)
+    return (runH, runActionToIO)
+
 scottyH :: Port -> ScottyH () -> IO ()
-scottyH p = scottyHOpts $ def { settings = (settings def) { settingsPort = p } }
+scottyH p s = do
+    (runH, runActionToIO) <- mkHStateRunners defaultConfig
+    scottyT p runH runActionToIO s
 
 scottyHOpts :: Options -> ScottyH () -> IO ()
 scottyHOpts opts s = do
-  when (verbose opts > 0) $
-    putStrLn $ "Setting phasers to stun... (port " ++ show (settingsPort (settings opts)) ++ ") (ctrl-c to quit)"
-  runSettings (settings opts) =<< scottyHApp s defaultConfig
+    (runH, runActionToIO) <- mkHStateRunners defaultConfig
+    scottyOptsT opts runH runActionToIO s
 
-
-scottyHApp :: ScottyH () -> MuConfig IO -> IO Application
-scottyHApp defs conf = do
-  (s, (muconf,_)) <- runStateT (execStateT (runScottyT defs) def) (conf, mempty)
-  routes' <- mapM (hroute muconf) (routes s)
-  return $ foldl (flip ($)) notFoundApp $  routes' ++ middlewares s
-
-hroute :: MuConfig IO -- ^ The initial config
-       -> MiddlewareT HState
-       -> IO Middleware
-hroute conf mw = return $ \app ->
-  let (r :: ApplicationT HState) = mw app
-  --- ApplicationT HState == Request -> ResourceT HState Response
-  in hoist (flip evalStateT (conf, mempty)) . r
-
-notFoundApp :: Application
-notFoundApp _ = return $ ResponseBuilder status404 [("Content-Type","text/html")]
-                       $ fromByteString "<h1>404: File Not Found!</h1>"
-
+scottyHApp :: MuConfig IO -> ScottyH () -> IO Application
+scottyHApp conf defs = do
+    (runH, runActionToIO) <- mkHStateRunners conf
+    scottyAppT runH runActionToIO defs
 
 setTemplatesDir :: FilePath -> ScottyH ()
 setTemplatesDir dir = do
