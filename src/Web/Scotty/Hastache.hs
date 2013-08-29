@@ -10,10 +10,10 @@
 -- | Hastache templating for Scotty
 module Web.Scotty.Hastache where
 
-import           Control.Concurrent.MVar
 import           Control.Monad.State             as State
 import qualified Data.Map                        as M
 import           Data.Maybe
+import    Data.IORef
 import           Data.Monoid
 import           Network.Wai
 import           Network.Wai.Handler.Warp        (Port)
@@ -33,14 +33,13 @@ type ActionH = ActionT HState
 
 mkHStateRunners :: MuConfig IO -> IO (forall a. HState a -> IO a, HState Response -> IO Response)
 mkHStateRunners conf = do
-    sync <- newEmptyMVar
+    gstate <- newIORef undefined
     let runH m = do
             (r,(muconf,_)) <- runStateT m (conf, mempty)
-            putMVar sync muconf
+            writeIORef gstate muconf
             return r
         runActionToIO m = do
-            -- state at the end of each action is not saved
-            muconf <- readMVar sync -- note readMVar instead of takeMVar, so non-blocking
+            muconf <- readIORef gstate
             evalStateT m (muconf, mempty)
     return (runH, runActionToIO)
 
