@@ -71,7 +71,7 @@ setHastacheConfig conf = do
 hastache :: FilePath -> ActionT HState ()
 hastache tpl = do
   ((conf :: MuConfig IO), tmap) <- lift State.get
-  header "Content-Type" "text/html"
+  setHeader "Content-Type" "text/html"
   let cntx a  = fromMaybe MuNothing (M.lookup a tmap)
   let tplFile = fromMaybe "." (muTemplateFileDir conf)
               </> tpl
