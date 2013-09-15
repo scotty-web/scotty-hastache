@@ -45,3 +45,4 @@ library
 source-repository head
   type:           git
   location:       https://github.com/co-dan/scotty-hastache
+bug-reports:      https://github.com/co-dan/scotty-hastache/issues

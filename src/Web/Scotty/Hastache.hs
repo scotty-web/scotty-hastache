@@ -158,8 +158,6 @@ scottyHApp conf defs = do
     (runH, runActionToIO) <- mkHStateRunners conf
     scottyAppT runH runActionToIO defs
 
--- * Orphans
-
 instance Show Markup where
   show = BRS.renderHtml
 
