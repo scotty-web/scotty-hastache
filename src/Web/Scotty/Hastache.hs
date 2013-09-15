@@ -121,8 +121,8 @@ setTemplateFileExt ext = do
 -- considered to be empty/null.
 hastache :: FilePath -> ActionT HState ()
 hastache tpl = do
-  (conf :: MuConfig IO, tmap) <- lift State.get
-  header "Content-Type" "text/html"
+  ((conf :: MuConfig IO), tmap) <- lift State.get
+  setHeader "Content-Type" "text/html"
   let cntx a  = fromMaybe MuNothing (M.lookup a tmap)
   let tplFile = fromMaybe "." (muTemplateFileDir conf)
               </> tpl
