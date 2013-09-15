@@ -6,8 +6,6 @@ Integrating Hastache to Scotty
 - [Scotty](http://github.com/xich/scotty) - a light-weighted Web framework/router
 - [Hastache](https://github.com/lymar/hastache) - Haskell implementation of [Mustache](http://mustache.github.io/) templates
 
-This is still work-in-progress
-
 ```haskell
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
