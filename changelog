@@ -1,0 +1,20 @@
+0.2
+---
+
+Keeping up with the Scotty 0.6 updating. The introduction of the
+custom exception types is reflected in the `scotty-hastache` package
+as well. The main types are now polymorphic over an exception type
+
+    type ScottyH e = ScottyT e HState
+    type ActionH e = ActionT e HState
+
+In addition, the specialized (to `Text`) types and runners are
+introduced
+
+    type ScottyH' = ScottyH Text
+    type ActionH' = ActionH Text
+    scottyH'     :: Port -> ScottyH' () -> IO ()
+    scottyHOpts' :: Options -> ScottyH' () -> IO ()
+
+
+Thanks to Kirill Zaborsky for pointing out the incompatibility with 0.6.

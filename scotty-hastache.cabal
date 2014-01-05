@@ -22,7 +22,8 @@ stability:           experimental
 build-type:          Simple
 cabal-version:       >=1.10
 
-extra-source-files:  examples/hastachetest.hs
+extra-source-files:  changelog
+                     examples/hastachetest.hs
                      examples/templates/greet.html
 
 library
