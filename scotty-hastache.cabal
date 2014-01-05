@@ -1,7 +1,7 @@
 name:                scotty-hastache
 version:             0.2.0
-homepage:            https://github.com/co-dan/scotty-hastache
-bug-reports:	     https://github.com/co-dan/scotty-hastache/issues
+homepage:            https://github.com/scotty-web/scotty-hastache
+bug-reports:	     https://github.com/scotty-web/scotty-hastache/issues
 synopsis:            Easy Mustache templating support for Scotty
 
 description:         This library provides a small templating DSL extension
@@ -16,7 +16,7 @@ license:             BSD3
 license-file:        LICENSE
 author:              Dan Frumin
 maintainer:          difrumin@gmail.com
-copyright:           (c) 2013 Dan Frumin <difrumin@gmail.com>
+copyright:           (c) 2013-2014 Dan Frumin <difrumin@gmail.com>
 category:            Web
 stability:           experimental
 build-type:          Simple
