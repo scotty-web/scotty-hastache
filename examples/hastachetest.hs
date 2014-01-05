@@ -7,7 +7,7 @@ import Web.Scotty.Trans as S
 import Web.Scotty.Hastache
 
 main :: IO ()
-main = scottyH 3000 $ do
+main = scottyH' 3000 $ do
   setTemplatesDir "templates"
 
   get "/:word" $ do
