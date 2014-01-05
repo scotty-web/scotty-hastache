@@ -1,7 +1,7 @@
 scotty-hastache
 ===============
 
-Integrating Hastache to Scotty
+Integrating Hastache into Scotty
 
 - [Scotty](http://github.com/xich/scotty) - a light-weighted Web framework/router
 - [Hastache](https://github.com/lymar/hastache) - Haskell implementation of [Mustache](http://mustache.github.io/) templates
@@ -15,8 +15,8 @@ import Web.Scotty.Trans as S
 import Web.Scotty.Hastache
 
 main :: IO ()
-main = scottyH 3000 $ do
-  setTemplatesDir "templates"
+main = scottyH' 3000 $ do
+  templates "templates"
   -- ^ Setting up the director with templates
   get "/:word" $ do
     beam <- param "word"
@@ -33,20 +33,14 @@ templates/greet.html:
 Installation
 =========
 
-1. Install GHC, Haskell platform, etc
-2. Install Scotty >= 0.5.0. Currently:
+1. Install GHC, Haskell platform, etc.
+2. Use cabal-install to automatically pull all the dependencies and
+install the library:
 
-  ```
-  $ git clone https://github.com/xich/scotty.git
-  $ cd scotty
-  $ cabal install
-  ```
-3. Install hastache:
-
-  ```
-  $ cabal install hastache
-  ```
-4. Clone & install scotty-hastache
+```
+cabal update
+cabal install scotty-hastache
+```
 
 Examples
 ========
