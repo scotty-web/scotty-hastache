@@ -53,9 +53,6 @@ import           Data.Text.Lazy                  (Text)
 import           Network.Wai                     (Application, Response)
 import           Network.Wai.Handler.Warp        (Port)
 import           System.FilePath.Posix           ((</>))
-import           Text.Blaze.Html.Renderer.String as BRS
-import           Text.Blaze.Html.Renderer.Utf8   as BRU
-import           Text.Blaze.Internal             (Markup)
 import           Text.Hastache
 import           Text.Hastache.Context
 
@@ -134,13 +131,12 @@ setTemplateFileExt ext = do
 hastache :: ScottyError e => FilePath -> ActionH e ()
 hastache tpl = do
   ((conf :: MuConfig IO), tmap) <- lift State.get
-  setHeader "Content-Type" "text/html"
   let cntx a  = fromMaybe MuNothing (M.lookup a tmap)
   let tplFile = fromMaybe "." (muTemplateFileDir conf)
               </> tpl
               ++ fromMaybe "" (muTemplateFileExt conf)
   res <- liftIO $ hastacheFile conf tplFile (mkStrContext cntx)
-  raw res
+  html res
 
 -- | Set the value of a mustache variable.
 setH :: ScottyError e => String -> MuType IO -> ActionH e ()
@@ -169,12 +165,5 @@ scottyHApp :: MuConfig IO -> ScottyH e () -> IO Application
 scottyHApp conf defs = do
     (runH, runActionToIO) <- mkHStateRunners conf
     scottyAppT runH runActionToIO defs
-
-instance Show Markup where
-  show = BRS.renderHtml
-
-instance MuVar Markup where
-  isEmpty = isEmpty . BRU.renderHtml
-  toLByteString = BRU.renderHtml
 
 
