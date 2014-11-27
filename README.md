@@ -16,7 +16,7 @@ import Web.Scotty.Hastache
 
 main :: IO ()
 main = scottyH' 3000 $ do
-  templates "templates"
+  setTemplatesDir "templates"
   -- ^ Setting up the director with templates
   get "/:word" $ do
     beam <- param "word"
